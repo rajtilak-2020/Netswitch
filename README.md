@@ -1,74 +1,133 @@
-# NetSwitch
+# 🌐 NetSwitch
+**Automated Network Configuration Utility for Windows**
 
-NetSwitch is a simple Windows batch script tool designed to easily switch between different network configurations on your computer. It provides two scripts: one for switching to a HOME network setup (using DHCP) and another for switching to a LAB network setup (using a static IP configuration). This tool is particularly useful for users who frequently switch between home and lab environments, such as developers, IT professionals, or students working in network-restricted lab settings.
+[NetSwitch](#netswitch) is a lightweight, Windows-native utility that streamlines the process of switching between **Dynamic (Home)** and **Static (Lab)** network environments. Designed for developers, network engineers, and students, it eliminates the need for manual command-line entry, ensuring a seamless transition between network types with just a double-click.
 
-## Features
+---
 
-- **HOME Network Setup**: Automatically configures your Ethernet interface to use DHCP for IP address and DNS, ideal for home or dynamic network environments.
-- **LAB Network Setup**: Sets a static IP address (10.2.11.80), subnet mask (255.255.252.0), gateway (10.2.8.1), and DNS (8.8.8.8) for lab environments.
-- **Simple Execution**: Run the appropriate batch file with administrator privileges to switch configurations instantly.
-- **Feedback**: Provides on-screen feedback confirming the network switch.
+## 📋 Overview
 
-## Prerequisites
+In complex network environments, switching between DHCP (Dynamic Host Configuration Protocol) and Static IP configurations can be tedious. NetSwitch abstracts this complexity into two simple, user-friendly scripts.
 
-- **Operating System**: Windows 10/11.
-- **Permissions**: Administrator privileges are required to modify network settings.
-- **Network Interface**: Assumes an Ethernet interface named "Ethernet". If your interface has a different name, you may need to modify the scripts accordingly.
+| Feature | HOME Network | LAB Network |
+| :--- | :--- | :--- |
+| **Protocol** | DHCP (Automatic) | Static IP |
+| **IP Address** | Assigned by Router | `10.2.11.80` |
+| **Subnet Mask** | Auto-assigned | `255.255.252.0` |
+| **Gateway** | Auto-assigned | `10.2.8.1` |
+| **DNS** | Auto-assigned | `8.8.8.8` (Google DNS) |
+| **Use Case** | Home, Office, Public Wi-Fi | Testing, Labs, Corporate Networks |
 
-## Installation
+---
 
-1. **Download the Scripts**:
-   - Clone or download the repository containing `netswitchhome.bat` and `netswitchlab.bat`.
+## 🏗️ Architecture
 
-2. **Place in Desired Location**:
-   - Save the batch files in a convenient location, such as your Desktop or a dedicated folder (e.g., `C:\NetSwitch`).
+NetSwitch operates as a lightweight batch automation tool. It uses the Windows `netsh` API to modify network stack settings. The following diagram illustrates the execution flow:
 
-3. **Run as Administrator**:
-   - Ensure you run the scripts with administrator privileges, as network configuration changes require elevated permissions.
-
-No additional software installation is required, as the scripts use built-in Windows `netsh` commands.
-
-## Usage
-
-### Switching to HOME Network
-1. Right-click on `netswitchhome.bat` and select "Run as administrator".
-2. The script will display: "Switching to HOME network (DHCP)...".
-3. It configures the Ethernet interface to use DHCP for IP and DNS.
-4. Upon completion, it shows: "HOME network enabled successfully."
-5. Press any key to close the window.
-
-### Switching to LAB Network
-1. Right-click on `netswitchlab.bat` and select "Run as administrator".
-2. The script will display: "Switching to LAB network...".
-3. It sets the Ethernet interface to static IP: 10.2.11.80, subnet: 255.255.252.0, gateway: 10.2.8.1, DNS: 8.8.8.8.
-4. Upon completion, it shows: "LAB network configured successfully."
-5. Press any key to close the window.
-
-### Troubleshooting
-- **Interface Name Mismatch**: If your network interface is not named "Ethernet", open the batch file in Notepad and change `set eth=Ethernet` to match your interface name (e.g., `set eth="Local Area Connection"`).
-- **Permission Denied**: Ensure you are running the script as an administrator. Right-click the file and select "Run as administrator".
-- **Network Issues**: After running, verify the network settings by opening Command Prompt and typing `ipconfig`. If issues persist, restart your computer or check network adapter settings.
-- **Firewall/Antivirus**: Some security software may block network changes. Temporarily disable if necessary, but re-enable afterward.
-
-## Files Description
-
-- **`netswitchhome.bat`**: Batch script to switch to HOME network configuration (DHCP).
-- **`netswitchlab.bat`**: Batch script to switch to LAB network configuration (static IP).
-
-## Customization
-
-To customize the LAB network settings:
-1. Open `netswitchlab.bat` in a text editor.
-2. Modify the static IP, subnet, gateway, or DNS values in the `netsh` commands.
-3. Save the file and run as administrator.
-
-Example customization:
-```
-netsh interface ip set address name="%eth%" static YOUR_IP YOUR_SUBNET YOUR_GATEWAY
-netsh interface ip set dns name="%eth%" static YOUR_DNS
+```mermaid
+graph TD
+    User[User Double-Clicks Script] -->|Triggers| AdminCheck{Admin Privileges?}
+    AdminCheck -->|No| RunError[❌ Access Denied]
+    AdminCheck -->|Yes| ScriptLogic{Which Script?}
+    
+    ScriptLogic -->|netswitchhome.bat| DHCP_Set[netsh: Set IP to DHCP]
+    ScriptLogic -->|netswitchlab.bat| Static_Set[netsh: Set IP to Static<br/>10.2.11.80]
+    
+    DHCP_Set --> Confirm[✅ HOME Enabled]
+    Static_Set --> DNS_Set[netsh: Set DNS to 8.8.8.8]
+    DNS_Set --> Confirm
+    
+    Confirm --> Feedback[Feedback Window<br/>Press Enter to Exit]
+    RunError --> Help[Read Troubleshooting Section]
 ```
 
+---
 
-## Disclaimer
+## 🚀 Quick Start
 
-Modifying network settings can disrupt connectivity. Ensure you have a backup of your current network configuration before use.
+### Prerequisites
+- **OS**: Windows 10/11 (64-bit recommended)
+- **Permissions**: Administrator rights
+- **Network**: Standard Ethernet adapter (Default name: `Ethernet`)
+
+### Installation
+1. Download or clone this repository.
+2. Extract the two batch files: `netswitchhome.bat` and `netswitchlab.bat`.
+3. Place them in a preferred folder (e.g., `C:\Tools\NetSwitch`).
+
+---
+
+## 🛠️ How to Use
+
+### 1️⃣ Switch to HOME Network (DHCP)
+*Best for: Home, Office, or dynamic environments.*
+
+1. Right-click `netswitchhome.bat`.
+2. Select **"Run as administrator"**.
+3. The script will configure the interface to request an IP from your local router.
+4. **Success**: You will see `HOME network enabled successfully.`
+
+### 2️⃣ Switch to LAB Network (Static)
+*Best for: Lab environments requiring fixed IP addresses.*
+
+1. Right-click `netswitchlab.bat`.
+2. Select **"Run as administrator"**.
+3. The script applies the static configuration:
+   - **IP**: `10.2.11.80`
+   - **Mask**: `255.255.252.0`
+   - **Gateway**: `10.2.8.1`
+   - **DNS**: `8.8.8.8`
+4. **Success**: You will see `LAB network configured successfully.`
+
+> 💡 **Tip**: Always verify your settings after running by opening Command Prompt and typing `ipconfig`.
+
+---
+
+## 🔧 Customization
+
+You only need to edit these files if your computer's network interface has a custom name.
+
+### Editing Interface Name
+Both scripts look for a variable named `%eth%`. If your adapter is named `Wi-Fi` or `Local Area Connection`, modify this line in the script:
+
+```batch
+:: Default (Ethernet)
+set eth=Ethernet
+
+:: Example for Wi-Fi
+set eth="Wi-Fi"
+```
+
+### Modifying LAB Settings
+To change the Lab IP address or Gateway, edit `netswitchlab.bat`:
+
+```batch
+:: Modify your static IP line
+netsh interface ip set address name="%eth%" static 192.168.1.50 255.255.255.0 192.168.1.1
+
+:: Modify DNS line
+netsh interface ip set dns name="%eth%" static 1.1.1.1
+```
+
+---
+
+## ⚠️ Troubleshooting
+
+| Issue | Possible Cause | Solution |
+| :--- | :--- | :--- |
+| **Access Denied** | Running without Admin rights | Right-click and select "Run as administrator". |
+| **Wrong Network** | Interface name mismatch | Edit `%eth=` in the batch file to match your adapter name. |
+| **No Internet** | Firewall/Antivirus block | Temporarily disable security software or add an exception for `netsh`. |
+| **Settings Not Saving** | Network service reset | Restart the computer or the specific network adapter service. |
+
+---
+
+## 📜 License & Disclaimer
+
+This tool is provided "as is" for educational and personal use.
+- **Network Modification Warning**: Changing network configurations can temporarily disrupt connectivity. Always ensure you understand the IP subnet being applied to avoid network conflicts.
+- **Data Backup**: If in doubt, perform a network backup (`ipconfig /all`) before making changes.
+
+---
+
+*Developed with 🧠 for efficient network management.*
