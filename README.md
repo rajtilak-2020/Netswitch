@@ -1,7 +1,7 @@
 # 🌐 NetSwitch
-**Automated Network Configuration Utility for Windows**
+**Automated Network Configuration Utility for Windows and Linux**
 
-[NetSwitch](#netswitch) is a lightweight, Windows-native utility that streamlines the process of switching between **Dynamic (Home)** and **Static (Lab)** network environments. Designed for developers, network engineers, and students, it eliminates the need for manual command-line entry, ensuring a seamless transition between network types with just a double-click.
+[NetSwitch](#netswitch) is a lightweight utility that streamlines the process of switching between **Dynamic (Home)** and **Static (Lab)** network environments. Designed for developers, network engineers, and students, it eliminates repetitive network configuration commands and makes transitions between network types quick and predictable on both Windows and Linux.
 
 ---
 
@@ -46,14 +46,19 @@ graph TD
 ## 🚀 Quick Start
 
 ### Prerequisites
-- **OS**: Windows 10/11 (64-bit recommended)
-- **Permissions**: Administrator rights
-- **Network**: Standard Ethernet adapter (Default name: `Ethernet`)
+- **Windows**: Windows 10/11 with Administrator rights
+- **Linux**: A NetworkManager-based system with `nmcli` installed and `sudo` access
+- **Network**: Standard Ethernet adapter
 
 ### Installation
 1. Download or clone this repository.
-2. Extract the two batch files: `netswitchhome.bat` and `netswitchlab.bat`.
-3. Place them in a preferred folder (e.g., `C:\Tools\NetSwitch`).
+2. Use the Windows batch files on Windows:
+   - `netswitchhome.bat`
+   - `netswitchlab.bat`
+3. Use the Linux shell scripts on Linux:
+   - `netswitchhome.sh`
+   - `netswitchlab.sh`
+4. Place them in a preferred folder.
 
 ---
 
@@ -81,11 +86,33 @@ graph TD
 
 > 💡 **Tip**: Always verify your settings after running by opening Command Prompt and typing `ipconfig`.
 
+### 3️⃣ Linux Usage
+*Best for: Linux systems using NetworkManager.*
+
+Run the scripts with `sudo`:
+
+```bash
+sudo ./netswitchhome.sh
+sudo ./netswitchlab.sh
+```
+
+The Linux scripts try to detect the active Ethernet interface and its NetworkManager connection automatically.
+
+If your setup needs a specific interface or connection name, you can override them:
+
+```bash
+sudo INTERFACE_NAME=enp3s0 ./netswitchhome.sh
+sudo INTERFACE_NAME=enp3s0 CONNECTION_NAME="Wired connection 1" ./netswitchlab.sh
+```
+
+You can also override the lab network values:
+
+```bash
+sudo IP_ADDRESS=10.2.11.80/22 GATEWAY=10.2.8.1 DNS_SERVER=8.8.8.8 ./netswitchlab.sh
+```
+
 ---
 
-## 🔧 Customization
-
-You only need to edit these files if your computer's network interface has a custom name.
 
 ### Editing Interface Name
 Both scripts look for a variable named `%eth%`. If your adapter is named `Wi-Fi` or `Local Area Connection`, modify this line in the script:
@@ -107,6 +134,12 @@ netsh interface ip set address name="%eth%" static 192.168.1.50 255.255.255.0 19
 
 :: Modify DNS line
 netsh interface ip set dns name="%eth%" static 1.1.1.1
+```
+
+For Linux, you can either edit `netswitchlab.sh` or pass values at runtime:
+
+```bash
+sudo IP_ADDRESS=192.168.1.50/24 GATEWAY=192.168.1.1 DNS_SERVER=1.1.1.1 ./netswitchlab.sh
 ```
 
 ---
